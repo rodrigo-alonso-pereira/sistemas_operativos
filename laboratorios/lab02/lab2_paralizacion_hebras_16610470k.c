@@ -21,10 +21,11 @@ typedef struct {
 // Variables globales
 data_pais lista_paises[0]; // Lista de paises (inicialmente vacia)
 int n_filas = 0; // Numero de filas leidas del archivo
+int max_campos = 0;
 
-// TODO: Agregar funcion para agregado dinamico de data_pais en caso de no existir en lista generla
+// TODO: Agregar funcion para agregado dinamico de data_pais en caso de no existir en lista general
 
-// Funcion para extraer campos de una linea CSV
+// Funcion para extraer campos de una linea CSV segun comas y comillas
 int extraer_campos_csv(char *linea, char **campos, int max_campos) {
     int num_campos = 0;
     int i = 0;
@@ -65,6 +66,7 @@ void *leer_pais(void *arg) {
         char linea_copia[1024];
         strcpy(linea_copia, datos->lineas[i]);
         
+        // TODO: Hacer que 20 sea dinamico segun primera fila de .csv
         int num_campos = extraer_campos_csv(linea_copia, campos, 20);
 
         if (campos[5][0] == '"') {
@@ -80,7 +82,7 @@ void *leer_pais(void *arg) {
                 i++;
             }
         }
-
+        // TODO: Agregar condicion para contar pais
         printf("[CONTROL] Hebra %d - Campo 5: %s\n", datos->id_hebra, campos[5]);
     }
 
