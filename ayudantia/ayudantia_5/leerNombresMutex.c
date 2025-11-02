@@ -46,7 +46,7 @@ int main() {
     FILE* archivo;
     int i;
 
-    // mutex
+    // Inicializa el mutex
     if (pthread_mutex_init(&mutex_contador_nombres, NULL) != 0) {
         perror("Error al inicializar el mutex");
         return 1;
@@ -82,6 +82,7 @@ int main() {
         printf("main: crea hebra %d para procesar desde el índice %d hasta %d\n",
                i, datos_para_hebras[i].inicio, datos_para_hebras[i].fin - 1);
 
+        // Crear la hebra
         if (pthread_create(&hebras[i], NULL, contar_nombres, &datos_para_hebras[i]) != 0) {
             perror("Error al crear la hebra");
 
@@ -96,11 +97,13 @@ int main() {
         }
     }
 
+    // Esperar a que todas las hebras terminen
     for (i = 0; i < NUM_HEBRAS; i++) {
         pthread_join(hebras[i], NULL);
         printf("Main: Hebra %d ha terminado.\n", i);
     }
 
+    // Destruir el mutex
     pthread_mutex_destroy(&mutex_contador_nombres);
 
     printf("\nTotal de nombres contados por las hebras: %d\n", contador_nombres_compartido);
