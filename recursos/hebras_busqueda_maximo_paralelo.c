@@ -33,6 +33,7 @@ void *mymax(void *arg) {
     limite *p = (limite *)arg; // Se castea el argumento al tipo de estructura que es
     // Como p ahora es un puntero de la estructura limite, se accede con flecha (->) a cada elemento de la estructura
     max = A[p->init];          // Se asume que el primer elemento es el mayor
+    // j < p->end = Evita el sopalamiento de elementos entre hebras
     for (j = p->init + 1; j < p->end; j++)
         max = (A[j] > max) ? A[j] : max; // Para cada elemento del vector, se ve si el leído es mayor que el anteriormente guardado
     
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
     int i;   // Usada para iterar
     int max; // Para guardar los maximos
     for (i = 0; i < N; i++)
-        A[i] = (int)random() % 100000; // Se crea un vector de enteros random
+        A[i] = (int)random() % 100000; // Se inicializa el vector con números random
 
     nthreads = atoi(argv[1]); // La cantidad de threads a utilizar se reciben como argumento de la función main
 
