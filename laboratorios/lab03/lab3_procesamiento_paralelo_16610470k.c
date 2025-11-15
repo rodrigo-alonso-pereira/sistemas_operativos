@@ -1,3 +1,4 @@
+#include "tda_lista_productos.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,24 +15,64 @@ typedef struct {
 
 // Estructura para contar paises
 typedef struct {
-    char producto[50]; // Nombre del pais con tamano maximo de 50 caracteres
+    char producto[50]; // Nombre del producto con tamano maximo de 50 caracteres
     int contador;
 } data_producto;
 
+// Nodo de la lista de nombres de productos
+typedef struct nodo {
+    char producto[50];
+    struct nodo *siguiente;
+} nodo;
+
+// Nodo inicial de la lista
+typedef struct {
+    nodo *inicio;
+    int tamano;
+} lista_productos;
+
 // Variables globales
 data_producto *lista_paises = NULL; // Lista de paises (asignación dinámica) -> Valor compartido
-int n_productos = 0; // Contador de paises
-int capacidad_paises = 0; // Capacidad del array
-int n_filas = 0; // Numero de filas leidas del archivo
-pthread_mutex_t mutex_paises; // Mutex para proteger lista_paises
+pthread_mutex_t mutex_paises;       // Mutex para proteger lista_paises
+
+// Función para agregar un producto a la lista
+void agregarProducto(lista_productos *lista, const char *nuevo_producto) {
+    nodo *nuevo_nodo = (nodo *)malloc(sizeof(nodo)); // Asignar memoria para el nuevo nodo
+    strncpy(nuevo_nodo->producto, nuevo_producto, sizeof(nuevo_nodo->producto) - 1); // Copiar el nombre del producto
+    nuevo_nodo->producto[sizeof(nuevo_nodo->producto) - 1] = '\0';                   // Asegurar que termine en null
+    nuevo_nodo->siguiente = lista->inicio;                                           // Insertar al inicio de la lista
+    lista->inicio = nuevo_nodo;                                                      // Actualizar el inicio de la lista
+    lista->tamano++; // Incrementar el tamaño de la lista
+}
+
+// Funcion para imprimir la lista de productos
+void imprimirProductos(lista_productos *lista) {
+    nodo *actual = lista->inicio; // Empezar desde el inicio de la lista
+    while (actual != NULL) {
+        printf("%s\n", actual->producto); // Imprimir el nombre del producto
+        actual = actual->siguiente;       // Mover al siguiente nodo
+    }
+    printf("Total de productos: %d\n", lista->tamano); // Imprimir cantidad de productos
+}
 
 char **leerArchivo(char *nombre_archivo) {
-    
+    FILE *archivo = fopen(nombre_archivo, "r"); // Abrir el archivo en modo lectura
+
+    // Verifica si el archivo se abrió correctamente
+    if (!archivo) {
+        perror("Error al abrir archivo");
+        pthread_mutex_destroy(&mutex_paises); // Destruir mutex antes de salir
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main(int argc, char *argv[]) {
+    int n_productos = 0;      // Contador de paises
+    int capacidad_paises = 0; // Capacidad del array
+    int n_filas = 0;          // Numero de filas leidas del archivo
+
     // Verificar que se pasaron los argumentos correctos
-    if (argc != 3) { 
+    if (argc != 3) {
         printf("Uso: %s nombre_archivo.txt numero_hebras\n", argv[0]);
         return 1;
     }
@@ -53,5 +94,4 @@ int main(int argc, char *argv[]) {
 
     // Leer el archivo y asignar valores a arreglo de string
     char **lineas = leerArchivo(archivo);
-
 }
