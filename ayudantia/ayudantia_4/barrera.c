@@ -10,7 +10,7 @@ void* tarea_hebra(void* arg) {
 
     printf("Hebra %d: Realizando tarea independiente\n", id);
 
-    // pthread_barrier_wait(&barrera); // Espera en la barrera hasta que todas las hebras lleguen aquí
+    pthread_barrier_wait(&barrera); // Espera en la barrera hasta que todas las hebras lleguen aquí
 
     printf("Hebra %d: Continuando con la siguiente tarea\n", id);
 
